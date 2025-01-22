@@ -1,74 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import Footer from "../components/layouts/footer/footer";
-import Header from "../components/layouts/header/header";
-import productosMock from "../mock/productosMock";
+import Footer from "../../components/layouts/footer/footer";
+import Header from "../../components/layouts/header/header";
+import productosMock from "../../mock/productosMock";
 import { MinusCircle, PlusCircle, ShoppingCart } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-export default function ProductosPage() {
-  const [cantidades, setCantidades] = useState(
-    productosMock.reduce((acc, producto) => ({ ...acc, [producto.id]: 0 }), {})
-  );
+export default function CategoriaPage() {
+  const router = useRouter();
+  const { category } = router.query; // Obtiene la categoría desde la URL
 
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
-  // Filtra los productos por categoría si está seleccionada
-  const productosFiltrados =
-    categoriaSeleccionada === null
-      ? productosMock
-      : productosMock.filter(
-          (producto) => producto.category === categoriaSeleccionada
-        );
-
-  const incrementarCantidad = (id) => {
-    setCantidades((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-  };
-
-  const decrementarCantidad = (id) => {
-    setCantidades((prev) => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
-  };
-
-  const agregarAlCarrito = (id) => {
-    console.log(
-      `Agregado al carrito: Producto ID ${id}, Cantidad: ${cantidades[id]}`
-    );
-  };
+  useEffect(() => {
+    if (category) {
+      // Filtra los productos según la categoría de la URL
+      const productosFiltrados = productosMock.filter(
+        (producto) => producto.category.toLowerCase() === category.toLowerCase()
+      );
+      setFilteredProducts(productosFiltrados);
+    }
+  }, [category]);
 
   return (
     <div className="min-h-screen bg-dark text-white">
       <Header />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <h1 className="text-4xl font-bold mb-8 text-center">
-          Nuestros Productos
+          Productos en la categoría: {category}
         </h1>
-        {/* Botones de categorías */}
-        <div className="flex justify-center mb-8 gap-4">
-          <button
-            onClick={() => setCategoriaSeleccionada(null)}
-            className="py-2 px-4 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-600 transition"
-          >
-            Todos
-          </button>
-          <button
-            onClick={() => setCategoriaSeleccionada("Ropa")}
-            className="py-2 px-4 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-600 transition"
-          >
-            Ropa
-          </button>
-          <button
-            onClick={() => setCategoriaSeleccionada("Accesorios")}
-            className="py-2 px-4 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-600 transition"
-          >
-            Accesorios
-          </button>
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {productosFiltrados.map((producto) => (
+          {filteredProducts.map((producto) => (
             <div
               key={producto.id}
               className="bg-stone-400 rounded-lg overflow-hidden shadow-md flex flex-col"

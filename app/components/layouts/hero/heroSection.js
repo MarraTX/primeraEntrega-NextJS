@@ -15,7 +15,7 @@ const HeroSection = () => {
                 Tu destino para todo lo relacionado con el cine
               </p>
               <Link
-                href="/peliculas"
+                href="/estrenos"
                 className="btn btn-primary bg-yellow-500 text-black hover:bg-yellow-600"
               >
                 Explorar Películas
