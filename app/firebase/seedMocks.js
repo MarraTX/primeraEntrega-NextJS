@@ -24,7 +24,7 @@ const agregarDocumentosAFirestore = async () => {
           precio: producto.precio,
           imagen: producto.imagen,
           category: producto.category,
-          stock: 90, // Agregamos un stock por defecto de 10 unidades
+          stock: 90, // Agregamos un stock por defecto de 90 unidades
         });
         console.log(`Producto agregado: ${producto.nombre}`);
       } else {
