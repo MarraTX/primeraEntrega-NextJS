@@ -3,6 +3,67 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .container-custom {
+    @apply px-4 mx-auto w-full;
+  }
+
+  @media (min-width: 640px) {
+    .container-custom {
+      max-width: 640px;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container-custom {
+      max-width: 768px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-custom {
+      max-width: 1024px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-custom {
+      max-width: 1280px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container-custom {
+      max-width: 1536px;
+    }
+  }
+
+  .responsive-grid {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .responsive-text {
+    @apply text-sm md:text-base lg:text-lg xl:text-xl;
+  }
+
+  .section-padding {
+    @apply py-8 md:py-12 lg:py-16 xl:py-20;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-[1.02];
+  }
+
+  .responsive-padding {
+    @apply px-4 sm:px-6 md:px-8 lg:px-12;
+  }
+
+  .main-container {
+    @apply pt-24 sm:pt-28 md:pt-32;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -21,37 +82,45 @@ body {
   font-family: "Inter", "Montserrat", serif;
 }
 
-@keyframes matrix-fall {
-  0% {
-    transform: translateY(-100%);
-    opacity: 1;
-  }
+@keyframes bounce-subtle {
+  0%,
   100% {
-    transform: translateY(1000%);
-    opacity: 0;
-  }
-}
-
-.animate-matrix-fall {
-  animation: matrix-fall linear infinite;
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
     transform: translateY(0);
   }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes scale-in {
+  0% {
+    transform: scale(0);
+  }
+  80% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 3s infinite ease-in-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
 }
 
 .animate-fade-in {
-  animation: fade-in 0.6s ease-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
-.animate-fade-in-delay {
-  animation: fade-in 0.6s ease-out 0.3s forwards;
-  opacity: 0;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

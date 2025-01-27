@@ -58,32 +58,32 @@ export default function NotFound() {
       </div>
 
       {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center">
-        <FileQuestion className="w-32 h-32 text-yellow-500 mb-8 animate-pulse" />
+      <div className="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-4xl mx-auto">
+        <FileQuestion className="w-24 h-24 md:w-32 md:h-32 text-yellow-500 mb-6 md:mb-8 animate-pulse" />
         <h1
-          className="text-5xl md:text-7xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300"
+          className="text-4xl md:text-7xl font-bold mb-4 md:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-yellow-500 to-yellow-300"
           role="heading"
           aria-label="Página no encontrada"
         >
           404
         </h1>
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-center animate-fade-in">
+        <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 animate-fade-in">
           ¡Error en la Matrix!
         </h2>
-        <p className="text-xl md:text-2xl mb-12 text-center text-gray-300 animate-fade-in-delay max-w-2xl">
+        <p className="text-lg md:text-2xl mb-8 md:mb-12 text-gray-300 animate-fade-in-delay max-w-2xl">
           Oops! Parece que esta escena no está en nuestro guión. No te
           preocupes, podemos ayudarte a encontrar el camino correcto.
         </p>
-        <div className="space-x-6 animate-fade-in-delay">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full animate-fade-in-delay">
           <Link
             href="/"
-            className="inline-block btn btn-primary bg-yellow-500 text-black hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-yellow-500/30"
+            className="w-full sm:w-auto inline-block btn btn-primary bg-yellow-500 text-black hover:bg-yellow-400 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-yellow-500/30 text-center"
           >
             Volver al inicio
           </Link>
           <button
             onClick={handleSupportClick}
-            className="inline-block btn btn-secondary bg-transparent border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-yellow-500/20"
+            className="w-full sm:w-auto inline-block btn btn-secondary bg-transparent border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 px-8 py-4 rounded-xl font-medium shadow-lg hover:shadow-yellow-500/20 text-center"
           >
             Contactar soporte
           </button>

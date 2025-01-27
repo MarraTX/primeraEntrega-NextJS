@@ -2,14 +2,19 @@
   "name": "ecommerce",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node app/firebase/seedMocks.js",
+    "update-stock": "node app/firebase/updateStock.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "firebase": "^11.2.0",
+    "framer-motion": "^12.0.6",
     "lucide-react": "^0.473.0",
     "next": "15.1.5",
     "react": "^19.0.0",

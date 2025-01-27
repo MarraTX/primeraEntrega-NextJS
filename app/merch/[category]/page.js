@@ -1,97 +1,197 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Footer from "../../components/layouts/footer/footer";
 import Header from "../../components/layouts/header/header";
-import productosMock from "../../mock/productosMock";
 import { MinusCircle, PlusCircle, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getProducts } from "../../firebase/firebase";
+import Loading from "../../components/common/loading/loading";
+import toast, { Toaster } from "react-hot-toast";
 
-export default function CategoriaPage() {
+export default function CategoriaPage({ params }) {
+  const { category } = params;
   const router = useRouter();
-  const { category } = router.query; // Obtiene la categoría desde la URL
 
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [cantidades, setCantidades] = useState({});
 
   useEffect(() => {
-    if (category) {
-      // Filtra los productos según la categoría de la URL
-      const productosFiltrados = productosMock.filter(
-        (producto) => producto.category.toLowerCase() === category.toLowerCase()
-      );
-      setFilteredProducts(productosFiltrados);
-    }
+    const fetchProducts = async () => {
+      try {
+        const productsData = await getProducts();
+        const productosFiltrados = productsData.filter(
+          (producto) =>
+            producto.category.toLowerCase() === category.toLowerCase()
+        );
+        setProductos(productosFiltrados);
+        setCantidades(
+          productosFiltrados.reduce(
+            (acc, producto) => ({ ...acc, [producto.id]: 0 }),
+            {}
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, [category]);
 
+  const decrementarCantidad = useCallback(
+    (id) => {
+      const currentAmount = cantidades[id] || 0;
+      if (currentAmount <= 0) {
+        toast.error("La cantidad no puede ser menor a 0");
+        return;
+      }
+      setCantidades((prev) => ({
+        ...prev,
+        [id]: currentAmount - 1,
+      }));
+    },
+    [cantidades]
+  );
+
+  const incrementarCantidad = useCallback(
+    (id) => {
+      const producto = productos.find((p) => p.id === id);
+      if (!producto) return;
+
+      const currentAmount = cantidades[id] || 0;
+      if (currentAmount >= producto.stock) {
+        toast.error(
+          `Has alcanzado el límite de stock disponible (${producto.stock})`
+        );
+        return;
+      }
+      setCantidades((prev) => ({
+        ...prev,
+        [id]: currentAmount + 1,
+      }));
+    },
+    [productos, cantidades]
+  );
+
+  const agregarAlCarrito = useCallback(
+    (id) => {
+      const producto = productos.find((p) => p.id === id);
+      if (producto) {
+        toast.success(`${producto.nombre} agregado al carrito`);
+      }
+    },
+    [productos]
+  );
+
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <div className="min-h-screen bg-black">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 2000,
+          style: {
+            background: "#333",
+            color: "#fff",
+          },
+        }}
+        gutter={8}
+        toasterId="unique-toaster"
+      />
       <Header />
-      <main className="container mx-auto px-4 pt-24 pb-12">
-        <h1 className="text-4xl font-bold mb-8 text-center">
-          Productos en la categoría: {category}
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center text-white mb-8">
+          {category.charAt(0).toUpperCase() + category.slice(1)}
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((producto) => (
-            <div
-              key={producto.id}
-              className="bg-stone-400 rounded-lg overflow-hidden shadow-md flex flex-col"
-            >
-              <div className="h-40">
-                <Image
-                  src={producto.imagen || "/placeholder.svg"}
-                  alt={producto.nombre}
-                  width={200}
-                  height={200}
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div className="p-4 flex-grow flex flex-col justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-black mb-2">
+
+        {loading ? (
+          <Loading />
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {productos.map((producto) => (
+              <div
+                key={producto.id}
+                className="bg-zinc-900 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 opacity-0 animate-fade-in"
+              >
+                <div className="p-4">
+                  <div className="aspect-square relative mb-4">
+                    <Image
+                      src={producto.imagen || "/placeholder.svg"}
+                      alt={producto.nombre}
+                      fill
+                      className="object-contain rounded-lg"
+                    />
+                  </div>
+                  <h2 className="text-xl font-semibold text-white mb-2">
                     {producto.nombre}
                   </h2>
-                  <p className="text-black text-sm mb-4">
-                    {producto.descripcion}
+                  <p className="text-gray-300 mb-4">{producto.descripcion}</p>
+                  <p className="text-yellow-500 font-bold text-lg mb-2">
+                    ${producto.precio}
                   </p>
-                  <p className="text-black font-bold mb-4">
-                    ${producto.precio.toLocaleString()}
-                  </p>
-                </div>
-                <div>
+                  <div className="text-gray-300 text-sm mb-2">
+                    Stock disponible: {producto.stock}
+                  </div>
                   <div className="flex items-center justify-between mb-4">
                     <button
                       onClick={() => decrementarCantidad(producto.id)}
-                      className="p-2 rounded-full bg-black hover:bg-stone-800 transition"
-                      disabled={cantidades[producto.id] === 0}
+                      className="text-yellow-500 hover:text-yellow-400 transition-colors"
                     >
-                      <MinusCircle className="h-5 w-5 text-yellow-500" />
+                      <MinusCircle size={24} />
                     </button>
-                    <span className="text-lg font-semibold text-black text-4xl">
+                    <span className="text-white font-medium text-lg">
                       {cantidades[producto.id] || 0}
                     </span>
                     <button
                       onClick={() => incrementarCantidad(producto.id)}
-                      className="p-2 rounded-full bg-black hover:bg-stone-400 transition"
+                      className="text-yellow-500 hover:text-yellow-400 transition-colors"
                     >
-                      <PlusCircle className="h-5 w-5 text-yellow-500" />
+                      <PlusCircle size={24} />
                     </button>
                   </div>
                   <button
                     onClick={() => agregarAlCarrito(producto.id)}
-                    className="w-full py-2 px-4 bg-yellow-500 text-black font-semibold rounded-md hover:bg-yellow-600 transition disabled:bg-gray-700 disabled:text-gray-400"
-                    disabled={cantidades[producto.id] === 0}
+                    disabled={!cantidades[producto.id]}
+                    className={`w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg transition-colors ${
+                      cantidades[producto.id]
+                        ? "bg-yellow-500 hover:bg-yellow-600 text-black"
+                        : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    }`}
                   >
-                    <ShoppingCart className="mr-2 h-5 w-5 inline" /> Agregar al
-                    Carrito
+                    <ShoppingCart size={20} />
+                    Agregar al carrito
                   </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
       <Footer />
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  const products = await getProducts();
+  const categories = [...new Set(products.map((product) => product.category))];
+
+  return categories.map((category) => ({
+    category: category.toLowerCase(),
+  }));
+}
+
+export async function generateMetadata({ params }) {
+  const { category } = params;
+
+  return {
+    title: `${
+      category.charAt(0).toUpperCase() + category.slice(1)
+    } | Tu Tienda`,
+    description: `Explora nuestra colección de ${category.toLowerCase()}`,
+  };
 }

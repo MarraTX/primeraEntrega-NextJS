@@ -1,9 +1,31 @@
-import React from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Play, Star, Calendar, Film } from "lucide-react";
-import peliculasTop from "../../../mock/peliculasMock";
+import { getPeliculas } from "../../../firebase/firebase";
+import Loading from "../../common/loading/loading";
+
 const HeroSection = () => {
+  const [peliculas, setPeliculas] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPeliculas = async () => {
+      try {
+        const peliculasData = await getPeliculas();
+        setPeliculas(peliculasData);
+      } catch (error) {
+        console.error("Error fetching películas:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPeliculas();
+  }, []);
+
   return (
     <>
       <div>
@@ -47,47 +69,53 @@ const HeroSection = () => {
             <h2 className="text-3xl font-bold text-center mb-12">
               Películas Destacadas
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
-              {peliculasTop.map((pelicula) => (
-                <div
-                  key={pelicula.id}
-                  className="bg-stone-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300"
-                >
-                  <Image
-                    src={pelicula.imagen || "/placeholder.svg"}
-                    alt={pelicula.titulo}
-                    width={200}
-                    height={300}
-                    className="w-full h-100 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold mb-2">{pelicula.titulo}</h3>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(pelicula.rating)
-                              ? "text-yellow-500 fill-current"
-                              : i === Math.floor(pelicula.rating) &&
-                                pelicula.rating % 1 !== 0
-                              ? "text-yellow-500 fill-current"
-                              : "text-gray-400"
-                          }`}
-                          style={
-                            i === Math.floor(pelicula.rating) &&
-                            pelicula.rating % 1 !== 0
-                              ? { clipPath: "inset(0 50% 0 0)" }
-                              : {}
-                          }
-                        />
-                      ))}
-                      <span className="ml-1">{pelicula.rating.toFixed(1)}</span>
+            {loading ? (
+              <Loading />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+                {peliculas.map((pelicula) => (
+                  <div
+                    key={pelicula.id}
+                    className="bg-stone-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 opacity-0 animate-fade-in"
+                  >
+                    <Image
+                      src={pelicula.imagen || "/placeholder.svg"}
+                      alt={pelicula.titulo}
+                      width={200}
+                      height={300}
+                      className="w-full h-100 object-cover"
+                    />
+                    <div className="p-4">
+                      <h3 className="font-semibold mb-2">{pelicula.titulo}</h3>
+                      <div className="flex items-center">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-4 h-4 ${
+                              i < Math.floor(pelicula.rating)
+                                ? "text-yellow-500 fill-current"
+                                : i === Math.floor(pelicula.rating) &&
+                                  pelicula.rating % 1 !== 0
+                                ? "text-yellow-500 fill-current"
+                                : "text-gray-400"
+                            }`}
+                            style={
+                              i === Math.floor(pelicula.rating) &&
+                              pelicula.rating % 1 !== 0
+                                ? { clipPath: "inset(0 50% 0 0)" }
+                                : {}
+                            }
+                          />
+                        ))}
+                        <span className="ml-1">
+                          {pelicula.rating.toFixed(1)}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="py-16 px-4 text-center bg-black">
