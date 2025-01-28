@@ -59,20 +59,27 @@ const agregarDocumentosAFirestore = async () => {
     // Agregar películas
     const peliculasCollection = collection(db, "peliculas");
     for (const pelicula of peliculasTop) {
-      // Verificar si la película ya existe
-      const q = query(peliculasCollection, where("id", "==", pelicula.id));
-      const querySnapshot = await getDocs(q);
+      try {
+        // Convertir y validar cada campo explícitamente
+        const peliculaData = {
+          titulo: String(pelicula.titulo),
+          imagen: String(pelicula.imagen),
+          rating: parseFloat(pelicula.rating) || 0,
+          anio: parseInt(pelicula.anio) || 0,
+          generos: pelicula.generos ? pelicula.generos.map(String) : [],
+        };
 
-      if (querySnapshot.empty) {
-        await addDoc(peliculasCollection, {
-          titulo: pelicula.titulo,
-          imagen: pelicula.imagen,
-          rating: pelicula.rating,
-          id: pelicula.id,
+        // Verificar que no haya valores undefined o null
+        Object.entries(peliculaData).forEach(([key, value]) => {
+          if (value === undefined || value === null) {
+            throw new Error(`Campo ${key} no puede ser null o undefined`);
+          }
         });
-        console.log(`Película agregada: ${pelicula.titulo}`);
-      } else {
-        console.log(`Película ya existe: ${pelicula.titulo}`);
+
+        await addDoc(peliculasCollection, peliculaData);
+        console.log(`Película agregada: ${peliculaData.titulo}`);
+      } catch (error) {
+        console.error(`Error al agregar película:`, error);
       }
     }
 
@@ -82,5 +89,13 @@ const agregarDocumentosAFirestore = async () => {
   }
 };
 
-// Ejecuta el script
-agregarDocumentosAFirestore();
+// Ejecutar la función
+agregarDocumentosAFirestore()
+  .then(() => {
+    console.log("Script finalizado");
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error("Error en el script:", error);
+    process.exit(1);
+  });

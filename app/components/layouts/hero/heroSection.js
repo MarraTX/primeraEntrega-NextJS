@@ -76,15 +76,25 @@ const HeroSection = () => {
                 {peliculas.map((pelicula) => (
                   <div
                     key={pelicula.id}
-                    className="bg-stone-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 opacity-0 animate-fade-in"
+                    className="bg-stone-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300 opacity-0 animate-fade-in group relative"
                   >
-                    <Image
-                      src={pelicula.imagen || "/placeholder.svg"}
-                      alt={pelicula.titulo}
-                      width={200}
-                      height={300}
-                      className="w-full h-100 object-cover"
-                    />
+                    <div className="relative w-full h-[300px] group">
+                      <Image
+                        src={pelicula.imagen || "/placeholder.svg"}
+                        alt={pelicula.titulo}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-4">
+                        <p className="text-yellow-500 font-semibold mb-2">
+                          Año: {pelicula.anio}
+                        </p>
+                        <p className="text-sm text-white">
+                          Géneros: {pelicula.generos?.join(", ")}
+                        </p>
+                      </div>
+                    </div>
                     <div className="p-4">
                       <h3 className="font-semibold mb-2">{pelicula.titulo}</h3>
                       <div className="flex items-center">
