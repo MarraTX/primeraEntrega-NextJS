@@ -1,32 +1,36 @@
-# OscarED - Tu Destino Cinematográfico 🎬
+# 🎬 OscarED - Plataforma de Cine y Merchandising
 
-Una aplicación web moderna construida con Next.js que ofrece una experiencia inmersiva en el mundo del cine, incluyendo reseñas, estrenos y merchandising.
+## 🌟 Características Principales
 
-## 🚀 Características
+- **Autenticación de Usuarios**
 
-- Catálogo de películas con información detallada
-- Sección de próximos estrenos
-- Sistema de calificación con estrellas
-- Tienda de merchandising
-- Diseño responsivo y moderno
-- Integración con Firebase
+  - Sistema de registro e inicio de sesión
+  - Roles de usuario (Admin/Usuario)
+  - Gestión de sesiones
+  - Perfil de usuario personalizado
 
-## 🛠 Tecnologías Utilizadas
+- **Panel de Administración**
 
-- Next.js 14
-- React
-- Firebase
-- Tailwind CSS
-- Framer Motion
-- Lucide Icons
+  - Gestión de productos y películas
+  - Control de usuarios
+  - Estadísticas y métricas
+  - Gestión de pedidos
 
-## 📋 Prerrequisitos
+- **Catálogo de Productos**
 
-- Node.js (versión 18 o superior)
-- npm o yarn
-- Cuenta de Firebase
+  - Películas y estrenos
+  - Merchandising exclusivo
+  - Carrito de compras
+  - Sistema de pagos
 
-## 🔧 Instalación
+- **Características Adicionales**
+  - Diseño responsive
+  - Animaciones fluidas
+  - Modo oscuro por defecto
+  - Carrito flotante
+  - Notificaciones toast
+
+## 🚀 Inicio Rápido
 
 1. Clona el repositorio:
 
@@ -73,24 +77,17 @@ npm run dev
 - `npm run dev` - Inicia el servidor de desarrollo
 - `npm run build` - Construye la aplicación para producción
 - `npm run start` - Inicia la aplicación en modo producción
-- `npm run seed` - Puebla la base de datos con datos de ejemplo
-
-## 🤝 Contribuir
-
-Las contribuciones son bienvenidas. Por favor, lee nuestras guías de contribución antes de enviar un pull request.
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
+- `npm run seed` - Crea el usuario administrador inicial
 
 ## 🎨 Diseño y UI
 
 El proyecto utiliza un diseño moderno con:
 
-- Tema oscuro
+- Tema oscuro por defecto
 - Animaciones suaves
 - Componentes interactivos
 - Sistema de diseño consistente
+- Interfaz adaptativa
 
 ## 📱 Responsive Design
 
@@ -99,9 +96,15 @@ La aplicación está optimizada para:
 - Dispositivos móviles
 - Tablets
 - Escritorio
+- Menú móvil adaptativo
 
 ## 🔗 Enlaces Útiles
 
 - [Documentación de Next.js](https://nextjs.org/docs)
 - [Firebase Console](https://console.firebase.google.com)
 - [Tailwind CSS](https://tailwindcss.com)
+- [Cloudinary Dashboard](https://cloudinary.com/console)
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.

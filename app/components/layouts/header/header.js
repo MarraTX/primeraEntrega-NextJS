@@ -189,9 +189,9 @@ export default function Header() {
             initial={{ opacity: 0, x: 100 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
-            className="fixed inset-y-0 right-0 w-full max-w-sm bg-zinc-900 border-l border-zinc-800 p-6 z-50 md:hidden"
+            className="fixed inset-y-0 right-0 w-full max-w-sm bg-zinc-950 shadow-xl border-l border-zinc-800/50 p-6 z-50 md:hidden"
           >
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full bg-zinc-950">
               <div className="flex justify-end mb-8">
                 <button
                   onClick={() => setIsOpen(false)}
@@ -200,13 +200,13 @@ export default function Header() {
                   <X size={24} />
                 </button>
               </div>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 bg-zinc-950">
                 {menuItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className="text-gray-300 hover:text-yellow-500 transition-colors"
+                    className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 bg-zinc-950"
                   >
                     <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
@@ -216,10 +216,31 @@ export default function Header() {
                   <Link
                     href="/admin"
                     onClick={() => setIsOpen(false)}
-                    className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2"
+                    className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 bg-zinc-950"
                   >
                     <Settings size={18} />
                     Administración
+                  </Link>
+                )}
+                {user ? (
+                  <button
+                    onClick={async () => {
+                      await handleLogout();
+                      setIsOpen(false);
+                    }}
+                    className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 bg-zinc-950"
+                  >
+                    <LogOut size={20} />
+                    Cerrar Sesión
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2 p-2 rounded-lg hover:bg-zinc-800/50 bg-zinc-950"
+                  >
+                    <LogIn size={20} />
+                    Iniciar Sesión
                   </Link>
                 )}
               </div>
