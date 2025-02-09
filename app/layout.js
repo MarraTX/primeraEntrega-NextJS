@@ -4,6 +4,7 @@ import { CartProvider } from "./components/context/CartContext";
 import FloatingCart from "./components/common/floatingCart/FloatingCart";
 import { Suspense } from "react";
 import Loading from "./components/common/loading/loading";
+import { AuthProvider } from "./components/context/authContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +28,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CartProvider>
-          <Suspense fallback={<Loading />}>{children}</Suspense>
-          <FloatingCart />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+            <FloatingCart />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

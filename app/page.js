@@ -9,6 +9,7 @@ import { getPeliculas } from "./firebase/firebase";
 import { motion } from "framer-motion";
 import { Play, Star, TrendingUp, ShoppingBag } from "lucide-react";
 import Loading from "./components/common/loading/loading";
+import { toast, Toaster } from "react-hot-toast";
 
 export default function Home() {
   const [peliculas, setPeliculas] = useState([]);
@@ -31,6 +32,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black to-zinc-900">
+      <Toaster />
       <Header />
       <main className="min-h-screen bg-gradient-to-b from-black to-zinc-900 text-white main-container">
         {/* Hero Section */}

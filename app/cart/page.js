@@ -26,10 +26,12 @@ import {
   getDoc,
   collection,
   getDocs,
+  addDoc,
 } from "firebase/firestore";
 import Loading from "../components/common/loading/loading";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useAuth } from "../components/context/authContext";
 
 export default function CartPage() {
   const { cartItems, setCartItems, updateQuantity } = useCart();
@@ -47,6 +49,7 @@ export default function CartPage() {
   const [showQuickAddMenu, setShowQuickAddMenu] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [itemToDelete, setItemToDelete] = useState(null);
+  const { user } = useAuth();
 
   const colors = [
     {
@@ -170,18 +173,35 @@ export default function CartPage() {
       toast.error("El carrito está vacío");
       return;
     }
+
+    if (!user) {
+      toast.error("Debes iniciar sesión para realizar la compra", {
+        duration: 3000,
+        style: {
+          background: "#18181b",
+          color: "#fbbf24",
+        },
+      });
+      return;
+    }
+
     setShowCheckoutModal(true);
   };
 
   const processCheckout = async () => {
     setLoading(true);
     try {
+      if (!user) {
+        toast.error("Debes iniciar sesión para realizar la compra");
+        return;
+      }
+
       const finalTotal = cartItems.reduce(
         (sum, item) => sum + item.precio * item.quantity,
         0
       );
 
-      // Actualizar stock en Firebase
+      // Actualizar stock y registrar ventas
       for (const item of cartItems) {
         const productRef = doc(db, "productos", item.id);
         const productSnap = await getDoc(productRef);
@@ -199,15 +219,21 @@ export default function CartPage() {
           await updateDoc(productRef, {
             stock: newStock,
           });
+
+          // Registrar venta con datos del usuario
+          await addDoc(collection(db, "ventas"), {
+            fecha: new Date(),
+            producto: item.nombre,
+            cliente: user.email,
+            monto: item.precio * item.quantity,
+            userId: user.uid,
+            quantity: item.quantity,
+          });
         }
       }
 
-      // Simular proceso de pago
       await new Promise((resolve) => setTimeout(resolve, 1500));
-
       setShowCheckoutModal(false);
-
-      // Modal de éxito con el total guardado
       setShowSuccessModal(true);
       localStorage.setItem("lastOrderTotal", finalTotal.toString());
       setCartItems([]);

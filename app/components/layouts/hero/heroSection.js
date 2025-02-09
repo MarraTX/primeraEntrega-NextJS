@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Play, Star, Calendar, Film } from "lucide-react";
+import { Play, Star, Calendar, Film, LogIn, LogOut } from "lucide-react";
 import { getPeliculas } from "../../../firebase/firebase";
 import Loading from "../../common/loading/loading";
+import { useAuth } from "../../context/authContext";
 
 const HeroSection = () => {
   const [peliculas, setPeliculas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user, userRole, handleLogout } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const fetchPeliculas = async () => {
@@ -36,12 +39,31 @@ const HeroSection = () => {
               <p className="text-xl mb-8">
                 Tu destino para todo lo relacionado con el cine
               </p>
-              <Link
-                href="/estrenos"
-                className="btn btn-primary bg-yellow-500 text-black hover:bg-yellow-600"
-              >
-                Explorar Películas
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/estrenos"
+                  className="btn btn-primary bg-yellow-500 text-black hover:bg-yellow-600"
+                >
+                  Explorar Películas
+                </Link>
+                {!user && (
+                  <Link
+                    href="/login"
+                    className="btn btn-secondary border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 flex items-center gap-2"
+                  >
+                    <LogIn size={20} />
+                    Iniciar Sesión
+                  </Link>
+                )}
+                {userRole === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="btn btn-secondary border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+                  >
+                    Dashboard
+                  </Link>
+                )}
+              </div>
             </div>
           </section>
           <section className="py-16 px-4 bg-stone-950">
@@ -145,6 +167,47 @@ const HeroSection = () => {
           </section>
         </main>
       </div>
+
+      {/* Menú móvil */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 bg-black/95 z-50">
+          <div className="flex flex-col items-center justify-center h-full space-y-8">
+            {/* ... otros enlaces del menú ... */}
+            {user ? (
+              <>
+                {userRole === "ADMIN" && (
+                  <Link
+                    href="/admin"
+                    className="text-gray-300 hover:text-yellow-500 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <button
+                  onClick={async () => {
+                    await handleLogout();
+                    setIsOpen(false);
+                  }}
+                  className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2"
+                >
+                  <LogOut size={20} />
+                  Cerrar Sesión
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="text-gray-300 hover:text-yellow-500 transition-colors flex items-center gap-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <LogIn size={20} />
+                Iniciar Sesión
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

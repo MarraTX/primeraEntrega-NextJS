@@ -9,6 +9,9 @@ import { getProducts } from "../firebase/firebase";
 import Loading from "../components/common/loading/loading";
 import toast, { Toaster } from "react-hot-toast";
 import { useCart } from "../components/context/CartContext";
+import { useAuth } from "../components/context/authContext";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase/firebaseConfig";
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
@@ -17,6 +20,8 @@ export default function ProductosPage() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
   const [selectedColors, setSelectedColors] = useState({});
   const { addToCart } = useCart();
+  const { user } = useAuth();
+  const [categorias, setCategorias] = useState(["Todos"]);
 
   const colors = [
     {
@@ -57,15 +62,27 @@ export default function ProductosPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("/api/products", {
-          next: {
-            revalidate: 3600, // Revalidar cada hora
-          },
+        const querySnapshot = await getDocs(collection(db, "productos"));
+        const productsData = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            categoria: data.categoria
+              ? data.categoria.trim().charAt(0).toUpperCase() +
+                data.categoria.trim().slice(1).toLowerCase()
+              : "",
+          };
         });
 
-        if (!response.ok) throw new Error("Error al cargar productos");
-        const productsData = await response.json();
+        // Extraer categorías únicas normalizadas
+        const uniqueCategories = [
+          ...new Set(productsData.map((product) => product.categoria)),
+        ]
+          .filter(Boolean) // Eliminar categorías vacías
+          .sort(); // Ordenar alfabéticamente
 
+        setCategorias(["Todos", ...uniqueCategories]);
         setProductos(productsData);
         setCantidades(
           productsData.reduce(
@@ -92,12 +109,12 @@ export default function ProductosPage() {
     fetchProducts();
   }, []);
 
-  // este es el filtro de productos por categoria
+  // Modificar el filtrado de productos
   const productosFiltrados =
-    categoriaSeleccionada === null
+    categoriaSeleccionada === "Todos" || categoriaSeleccionada === null
       ? productos
       : productos.filter(
-          (producto) => producto.category === categoriaSeleccionada
+          (producto) => producto.categoria === categoriaSeleccionada
         );
 
   const incrementarCantidad = useCallback(
@@ -136,6 +153,17 @@ export default function ProductosPage() {
   );
 
   const agregarAlCarrito = (id) => {
+    if (!user) {
+      toast.error("Debes iniciar sesión para agregar productos al carrito", {
+        duration: 3000,
+        style: {
+          background: "#18181b",
+          color: "#fbbf24",
+        },
+      });
+      return;
+    }
+
     const producto = productos.find((p) => p.id === id);
     const cantidad = cantidades[id];
     const filterValue = selectedColors[id] || "brightness(1) saturate(100%)";
@@ -143,7 +171,6 @@ export default function ProductosPage() {
 
     if (producto && cantidad > 0) {
       addToCart(producto, cantidad, filterValue, colorName);
-      // Resetear la cantidad después de agregar al carrito
       setCantidades((prev) => ({
         ...prev,
         [id]: 0,
@@ -183,7 +210,7 @@ export default function ProductosPage() {
         toasterId="unique-toaster"
       />
       <Header />
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-28 pb-32">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in">
             Nuestros Productos
@@ -193,37 +220,25 @@ export default function ProductosPage() {
           </p>
         </div>
 
-        <div className="flex justify-center gap-4 mb-12">
-          <button
-            onClick={() => setCategoriaSeleccionada(null)}
-            className={`px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 ${
-              categoriaSeleccionada === null
-                ? "bg-yellow-500 text-black font-semibold shadow-lg shadow-yellow-500/20"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            }`}
-          >
-            Todos
-          </button>
-          <button
-            onClick={() => setCategoriaSeleccionada("Ropa")}
-            className={`px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 ${
-              categoriaSeleccionada === "Ropa"
-                ? "bg-yellow-500 text-black font-semibold shadow-lg shadow-yellow-500/20"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            }`}
-          >
-            Ropa
-          </button>
-          <button
-            onClick={() => setCategoriaSeleccionada("Accesorios")}
-            className={`px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 ${
-              categoriaSeleccionada === "Accesorios"
-                ? "bg-yellow-500 text-black font-semibold shadow-lg shadow-yellow-500/20"
-                : "bg-zinc-800 text-white hover:bg-zinc-700"
-            }`}
-          >
-            Accesorios
-          </button>
+        <div className="flex justify-center gap-4 mb-12 flex-wrap">
+          {categorias.map((categoria) => (
+            <button
+              key={categoria}
+              onClick={() =>
+                setCategoriaSeleccionada(
+                  categoria === "Todos" ? null : categoria
+                )
+              }
+              className={`px-6 py-3 rounded-full transition-all duration-300 transform hover:scale-105 ${
+                (categoria === "Todos" && categoriaSeleccionada === null) ||
+                categoria === categoriaSeleccionada
+                  ? "bg-yellow-500 text-black font-semibold shadow-lg shadow-yellow-500/20"
+                  : "bg-zinc-800 text-white hover:bg-zinc-700"
+              }`}
+            >
+              {categoria}
+            </button>
+          ))}
         </div>
 
         {loading ? (
